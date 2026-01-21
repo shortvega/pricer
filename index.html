@@ -21,13 +21,7 @@
             --accent-red: #ef4444;
             --accent-blue: #3b82f6;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'JetBrains Mono', monospace;
             background: var(--bg-primary);
@@ -35,38 +29,9 @@
             min-height: 100vh;
             line-height: 1.6;
         }
-
-        .noise-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            opacity: 0.03;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-            z-index: 1000;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 40px 24px;
-        }
-
-        header {
-            margin-bottom: 48px;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .header-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-        }
-
+        .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
+        header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); }
+        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
         h1 {
             font-family: 'Instrument Serif', serif;
             font-size: 3rem;
@@ -77,437 +42,91 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .live-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .live-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
+        .live-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .live-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse {
             0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
             50% { opacity: 0.8; box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
         }
-
-        .subtitle {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            font-weight: 300;
+        .subtitle { font-size: 0.875rem; color: var(--text-muted); font-weight: 300; }
+        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
+        .panel { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
+        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-secondary); font-weight: 500; }
+        .panel-badge { font-size: 0.65rem; padding: 4px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 100px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .panel-body { padding: 24px; }
+        .input-section { margin-bottom: 28px; }
+        .input-section:last-child { margin-bottom: 0; }
+        .section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-orange); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-label::before { content: ''; width: 12px; height: 1px; background: var(--accent-orange); }
+        .input-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        .input-grid.triple { grid-template-columns: repeat(3, 1fr); }
+        .input-group { position: relative; }
+        .input-group.full-width { grid-column: 1 / -1; }
+        label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 400; }
+        input[type="number"], select {
+            width: 100%; padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color);
+            border-radius: 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; transition: all 0.2s ease;
         }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-        }
-
-        @media (max-width: 1024px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .panel {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .panel-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-title {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .panel-badge {
-            font-size: 0.65rem;
-            padding: 4px 10px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 100px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .panel-body {
-            padding: 24px;
-        }
-
-        .input-section {
-            margin-bottom: 28px;
-        }
-
-        .input-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .section-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            color: var(--accent-orange);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .section-label::before {
-            content: '';
-            width: 12px;
-            height: 1px;
-            background: var(--accent-orange);
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .input-grid.triple {
-            grid-template-columns: repeat(3, 1fr);
-        }
-
-        .input-group {
-            position: relative;
-        }
-
-        .input-group.full-width {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-            font-weight: 400;
-        }
-
-        input[type="number"],
+        input[type="number"]:focus, select:focus { outline: none; border-color: var(--accent-orange); box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1); }
         select {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
+            cursor: pointer; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 16px center; padding-right: 44px;
         }
-
-        input[type="number"]:focus,
-        select:focus {
-            outline: none;
-            border-color: var(--accent-orange);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
-        }
-
-        input[type="number"]::placeholder {
-            color: var(--text-muted);
-        }
-
-        select {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 44px;
-        }
-
-        .toggle-group {
-            display: flex;
-            gap: 8px;
-        }
-
+        .toggle-group { display: flex; gap: 8px; }
         .toggle-btn {
-            flex: 1;
-            padding: 14px 16px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            flex: 1; padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px;
+            color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; cursor: pointer;
+            transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 0.05em;
         }
-
-        .toggle-btn:hover {
-            border-color: var(--border-highlight);
-            color: var(--text-secondary);
-        }
-
-        .toggle-btn.active {
-            background: var(--accent-orange);
-            border-color: var(--accent-orange);
-            color: var(--bg-primary);
-            font-weight: 500;
-        }
-
-        .toggle-btn.call.active {
-            background: var(--accent-green);
-            border-color: var(--accent-green);
-        }
-
-        .toggle-btn.put.active {
-            background: var(--accent-red);
-            border-color: var(--accent-red);
-        }
-
+        .toggle-btn:hover { border-color: var(--border-highlight); color: var(--text-secondary); }
+        .toggle-btn.active { background: var(--accent-orange); border-color: var(--accent-orange); color: var(--bg-primary); font-weight: 500; }
+        .toggle-btn.call.active { background: var(--accent-green); border-color: var(--accent-green); }
+        .toggle-btn.put.active { background: var(--accent-red); border-color: var(--accent-red); }
         .calculate-btn {
-            width: 100%;
-            padding: 18px 24px;
-            background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dim) 100%);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 8px;
+            width: 100%; padding: 18px 24px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dim) 100%);
+            border: none; border-radius: 8px; color: white; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+            font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.3s ease; margin-top: 8px;
         }
-
-        .calculate-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);
-        }
-
-        .calculate-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Results Panel */
-        .results-panel {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .result-main {
-            padding: 32px 24px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
-        }
-
-        .result-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .result-value {
-            font-family: 'Instrument Serif', serif;
-            font-size: 4rem;
-            font-weight: 400;
-            color: var(--text-primary);
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .result-value .currency {
-            font-size: 2rem;
-            color: var(--text-secondary);
-            vertical-align: super;
-        }
-
-        .result-change {
-            font-size: 0.85rem;
-            color: var(--accent-green);
-        }
-
-        .result-change.negative {
-            color: var(--accent-red);
-        }
-
-        .greeks-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1px;
-            background: var(--border-color);
-        }
-
-        .greek-item {
-            background: var(--bg-secondary);
-            padding: 20px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .greek-name {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        .greek-symbol {
-            color: var(--accent-blue);
-            margin-right: 6px;
-        }
-
-        .greek-value {
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-
-        .barrier-status {
-            padding: 24px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .status-indicator {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-        }
-
-        .status-indicator.active {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid var(--accent-green);
-            color: var(--accent-green);
-        }
-
-        .status-indicator.inactive {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid var(--accent-red);
-            color: var(--accent-red);
-        }
-
-        .status-text h4 {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .status-text p {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .info-panel {
-            margin-top: 24px;
-            padding: 20px 24px;
-            background: var(--bg-tertiary);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-        }
-
-        .info-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent-blue);
-            margin-bottom: 12px;
-        }
-
-        .info-text {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        .quick-presets {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .preset-btn {
-            padding: 8px 14px;
-            background: transparent;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            color: var(--text-muted);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .preset-btn:hover {
-            border-color: var(--accent-orange);
-            color: var(--accent-orange);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .panel {
-            animation: fadeIn 0.5s ease forwards;
-        }
-
-        .panel:nth-child(2) {
-            animation-delay: 0.1s;
-        }
+        .calculate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3); }
+        .results-panel { display: flex; flex-direction: column; }
+        .result-main { padding: 32px 24px; text-align: center; border-bottom: 1px solid var(--border-color); background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); }
+        .result-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 8px; }
+        .result-value { font-family: 'Instrument Serif', serif; font-size: 4rem; font-weight: 400; color: var(--text-primary); line-height: 1; margin-bottom: 8px; }
+        .result-value .currency { font-size: 2rem; color: var(--text-secondary); vertical-align: super; }
+        .result-change { font-size: 0.85rem; color: var(--accent-green); }
+        .result-change.negative { color: var(--accent-red); }
+        .greeks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-color); }
+        .greek-item { background: var(--bg-secondary); padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .greek-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+        .greek-symbol { color: var(--accent-blue); margin-right: 6px; }
+        .greek-value { font-size: 1.1rem; font-weight: 500; color: var(--text-primary); }
+        .barrier-status { padding: 24px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
+        .status-indicator { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .status-indicator.active { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); }
+        .status-indicator.inactive { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); }
+        .status-text h4 { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
+        .status-text p { font-size: 0.8rem; color: var(--text-muted); }
+        .info-panel { margin-top: 24px; padding: 20px 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; }
+        .info-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-blue); margin-bottom: 12px; }
+        .info-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
+        .quick-presets { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .preset-btn { padding: 8px 14px; background: transparent; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; cursor: pointer; transition: all 0.2s ease; }
+        .preset-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
     </style>
 </head>
 <body>
-    <div class="noise-overlay"></div>
-    
     <div class="container">
         <header>
             <div class="header-top">
                 <h1>Barrier Options Pricer</h1>
-                <div class="live-indicator">
-                    <div class="live-dot"></div>
-                    <span>Model Ready</span>
-                </div>
+                <div class="live-indicator"><div class="live-dot"></div><span>Model Ready</span></div>
             </div>
             <p class="subtitle">Black-Scholes pricing engine for European barrier options with knock-in/knock-out features</p>
         </header>
-
         <div class="main-grid">
-            <!-- Input Panel -->
             <div class="panel">
                 <div class="panel-header">
                     <span class="panel-title">Parameters</span>
@@ -515,33 +134,31 @@
                 </div>
                 <div class="panel-body">
                     <div class="quick-presets">
-                        <button class="preset-btn" onclick="loadPreset('btc3m')">BTC 3M Call</button>
-                        <button class="preset-btn" onclick="loadPreset('eth1m')">ETH 1M Put</button>
-                        <button class="preset-btn" onclick="loadPreset('spx6m')">SPX 6M Call</button>
+                        <button class="preset-btn" id="presetBtc3m">BTC 3M Call</button>
+                        <button class="preset-btn" id="presetEth1m">ETH 1M Put</button>
+                        <button class="preset-btn" id="presetSpx6m">SPX 6M Call</button>
                     </div>
-
                     <div class="input-section">
                         <div class="section-label">Underlying Asset</div>
                         <div class="input-grid">
                             <div class="input-group">
                                 <label>Spot Price ($)</label>
-                                <input type="number" id="spotPrice" value="97000" step="100" placeholder="Current price">
+                                <input type="number" id="spotPrice" value="97000" step="100">
                             </div>
                             <div class="input-group">
                                 <label>Strike Price ($)</label>
-                                <input type="number" id="strikePrice" value="100000" step="100" placeholder="Strike">
+                                <input type="number" id="strikePrice" value="100000" step="100">
                             </div>
                         </div>
                     </div>
-
                     <div class="input-section">
                         <div class="section-label">Option Type</div>
                         <div class="input-grid">
                             <div class="input-group">
                                 <label>Call / Put</label>
                                 <div class="toggle-group">
-                                    <button class="toggle-btn call active" id="callBtn" onclick="setOptionType('call')">Call</button>
-                                    <button class="toggle-btn put" id="putBtn" onclick="setOptionType('put')">Put</button>
+                                    <button class="toggle-btn call active" id="callBtn">Call</button>
+                                    <button class="toggle-btn put" id="putBtn">Put</button>
                                 </div>
                             </div>
                             <div class="input-group">
@@ -556,312 +173,169 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="input-section">
                         <div class="section-label">Barrier Configuration</div>
                         <div class="input-grid">
                             <div class="input-group">
                                 <label>Barrier Direction</label>
                                 <div class="toggle-group">
-                                    <button class="toggle-btn active" id="upBtn" onclick="setBarrierDirection('up')">Up</button>
-                                    <button class="toggle-btn" id="downBtn" onclick="setBarrierDirection('down')">Down</button>
+                                    <button class="toggle-btn active" id="upBtn">Up</button>
+                                    <button class="toggle-btn" id="downBtn">Down</button>
                                 </div>
                             </div>
                             <div class="input-group">
                                 <label>Barrier Type</label>
                                 <div class="toggle-group">
-                                    <button class="toggle-btn" id="inBtn" onclick="setBarrierType('in')">Knock-In</button>
-                                    <button class="toggle-btn active" id="outBtn" onclick="setBarrierType('out')">Knock-Out</button>
+                                    <button class="toggle-btn" id="inBtn">Knock-In</button>
+                                    <button class="toggle-btn active" id="outBtn">Knock-Out</button>
                                 </div>
                             </div>
                             <div class="input-group full-width">
                                 <label>Barrier Level ($)</label>
-                                <input type="number" id="barrierLevel" value="110000" step="100" placeholder="Barrier price">
+                                <input type="number" id="barrierLevel" value="110000" step="100">
                             </div>
                         </div>
                     </div>
-
                     <div class="input-section">
                         <div class="section-label">Market Parameters</div>
                         <div class="input-grid triple">
                             <div class="input-group">
                                 <label>Volatility (%)</label>
-                                <input type="number" id="volatility" value="65" step="1" placeholder="σ">
+                                <input type="number" id="volatility" value="65" step="1">
                             </div>
                             <div class="input-group">
                                 <label>Risk-Free Rate (%)</label>
-                                <input type="number" id="riskFreeRate" value="5" step="0.1" placeholder="r">
+                                <input type="number" id="riskFreeRate" value="5" step="0.1">
                             </div>
                             <div class="input-group">
                                 <label>Dividend Yield (%)</label>
-                                <input type="number" id="dividendYield" value="0" step="0.1" placeholder="q">
+                                <input type="number" id="dividendYield" value="0" step="0.1">
                             </div>
                         </div>
                     </div>
-
-                    <button class="calculate-btn" onclick="calculateOption()">
-                        Calculate Price
-                    </button>
+                    <button class="calculate-btn" id="calculateBtn">Calculate Price</button>
                 </div>
             </div>
-
-            <!-- Results Panel -->
             <div class="panel results-panel">
                 <div class="panel-header">
                     <span class="panel-title">Valuation</span>
                     <span class="panel-badge" id="optionTypeLabel">Up-and-Out Call</span>
                 </div>
-                
                 <div class="result-main">
                     <div class="result-label">Option Premium</div>
-                    <div class="result-value">
-                        <span class="currency">$</span><span id="premiumValue">—</span>
-                    </div>
-                    <div class="result-change" id="vanillaComparison">vs. vanilla: —</div>
+                    <div class="result-value"><span class="currency">$</span><span id="premiumValue">-</span></div>
+                    <div class="result-change" id="vanillaComparison">vs. vanilla: -</div>
                 </div>
-
                 <div class="greeks-grid">
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">Δ</span> Delta</span>
-                        <span class="greek-value" id="deltaValue">—</span>
-                    </div>
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">Γ</span> Gamma</span>
-                        <span class="greek-value" id="gammaValue">—</span>
-                    </div>
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">Θ</span> Theta</span>
-                        <span class="greek-value" id="thetaValue">—</span>
-                    </div>
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">V</span> Vega</span>
-                        <span class="greek-value" id="vegaValue">—</span>
-                    </div>
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">ρ</span> Rho</span>
-                        <span class="greek-value" id="rhoValue">—</span>
-                    </div>
-                    <div class="greek-item">
-                        <span class="greek-name"><span class="greek-symbol">λ</span> Lambda</span>
-                        <span class="greek-value" id="lambdaValue">—</span>
-                    </div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">D</span> Delta</span><span class="greek-value" id="deltaValue">-</span></div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">G</span> Gamma</span><span class="greek-value" id="gammaValue">-</span></div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">T</span> Theta</span><span class="greek-value" id="thetaValue">-</span></div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">V</span> Vega</span><span class="greek-value" id="vegaValue">-</span></div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">R</span> Rho</span><span class="greek-value" id="rhoValue">-</span></div>
+                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">L</span> Lambda</span><span class="greek-value" id="lambdaValue">-</span></div>
                 </div>
-
                 <div class="barrier-status">
-                    <div class="status-indicator active" id="statusIndicator">✓</div>
+                    <div class="status-indicator active" id="statusIndicator">OK</div>
                     <div class="status-text">
                         <h4 id="statusTitle">Option Active</h4>
                         <p id="statusDescription">Barrier has not been breached</p>
                     </div>
                 </div>
-
                 <div class="info-panel">
                     <div class="info-title">Barrier Option Details</div>
-                    <p class="info-text" id="optionDescription">
-                        An <strong>Up-and-Out Call</strong> is a call option that ceases to exist if the underlying asset price rises above the barrier level. This makes it cheaper than a vanilla call since there's a risk the option gets knocked out before expiry.
-                    </p>
+                    <p class="info-text" id="optionDescription">An <strong>Up-and-Out Call</strong> is a call option that ceases to exist if the underlying asset price rises above the barrier level.</p>
                 </div>
             </div>
         </div>
     </div>
-
     <script>
-        // Global state
-        let optionType = 'call';
-        let barrierDirection = 'up';
-        let barrierType = 'out';
+        var optionType = 'call';
+        var barrierDirection = 'up';
+        var barrierType = 'out';
 
-        // Standard normal CDF approximation (Abramowitz and Stegun)
         function normalCDF(x) {
-            const a1 = 0.254829592;
-            const a2 = -0.284496736;
-            const a3 = 1.421413741;
-            const a4 = -1.453152027;
-            const a5 = 1.061405429;
-            const p = 0.3275911;
-
-            const sign = x < 0 ? -1 : 1;
+            var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+            var sign = x < 0 ? -1 : 1;
             x = Math.abs(x) / Math.sqrt(2);
-
-            const t = 1.0 / (1.0 + p * x);
-            const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-
+            var t = 1.0 / (1.0 + p * x);
+            var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
             return 0.5 * (1.0 + sign * y);
         }
 
-        // Standard normal PDF
-        function normalPDF(x) {
-            return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
-        }
-
-        // Vanilla Black-Scholes price
         function blackScholesVanilla(S, K, T, r, q, sigma, isCall) {
-            const d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
-            const d2 = d1 - sigma * Math.sqrt(T);
-
-            if (isCall) {
-                return S * Math.exp(-q * T) * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
-            } else {
-                return K * Math.exp(-r * T) * normalCDF(-d2) - S * Math.exp(-q * T) * normalCDF(-d1);
-            }
+            var d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
+            var d2 = d1 - sigma * Math.sqrt(T);
+            if (isCall) return S * Math.exp(-q * T) * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
+            return K * Math.exp(-r * T) * normalCDF(-d2) - S * Math.exp(-q * T) * normalCDF(-d1);
         }
 
-        // Barrier option pricing using closed-form solutions
         function barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut) {
-            // Lambda and other parameters
-            const lambda = (r - q + sigma * sigma / 2) / (sigma * sigma);
-            const y = Math.log(H * H / (S * K)) / (sigma * Math.sqrt(T)) + lambda * sigma * Math.sqrt(T);
-            const x1 = Math.log(S / H) / (sigma * Math.sqrt(T)) + lambda * sigma * Math.sqrt(T);
-            const y1 = Math.log(H / S) / (sigma * Math.sqrt(T)) + lambda * sigma * Math.sqrt(T);
-
-            const d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
-            const d2 = d1 - sigma * Math.sqrt(T);
-
-            // Calculate vanilla price for reference
-            const vanillaPrice = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
-
-            let barrierPrice = 0;
+            var lambda = (r - q + sigma * sigma / 2) / (sigma * sigma);
+            var sqrtT = sigma * Math.sqrt(T);
+            var y = Math.log(H * H / (S * K)) / sqrtT + lambda * sqrtT;
+            var x1 = Math.log(S / H) / sqrtT + lambda * sqrtT;
+            var y1 = Math.log(H / S) / sqrtT + lambda * sqrtT;
+            var d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / sqrtT;
+            var d2 = d1 - sqrtT;
+            var vanillaPrice = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
+            var price = 0, A, B, C, D, HS = Math.pow(H / S, 2 * lambda), HS2 = Math.pow(H / S, 2 * lambda - 2);
+            var eqT = Math.exp(-q * T), erT = Math.exp(-r * T);
 
             if (isCall) {
                 if (isUp) {
-                    // Up barrier for call
-                    if (H <= K) {
-                        // Barrier is below strike - special case
-                        if (isKnockOut) {
-                            barrierPrice = 0; // Always knocked out or worthless
-                        } else {
-                            barrierPrice = vanillaPrice;
-                        }
-                    } else {
-                        // Standard up-and-out/in call (H > K)
-                        const A = S * Math.exp(-q * T) * normalCDF(x1) - K * Math.exp(-r * T) * normalCDF(x1 - sigma * Math.sqrt(T));
-                        const B = S * Math.exp(-q * T) * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
-                        const C = S * Math.exp(-q * T) * Math.pow(H / S, 2 * lambda) * normalCDF(y) 
-                                - K * Math.exp(-r * T) * Math.pow(H / S, 2 * lambda - 2) * normalCDF(y - sigma * Math.sqrt(T));
-                        const D = S * Math.exp(-q * T) * Math.pow(H / S, 2 * lambda) * normalCDF(y1) 
-                                - K * Math.exp(-r * T) * Math.pow(H / S, 2 * lambda - 2) * normalCDF(y1 - sigma * Math.sqrt(T));
-
-                        if (isKnockOut) {
-                            // Up-and-out call
-                            barrierPrice = A - C;
-                            if (S >= H) barrierPrice = 0; // Already knocked out
-                        } else {
-                            // Up-and-in call
-                            barrierPrice = vanillaPrice - (A - C);
-                            if (S >= H) barrierPrice = vanillaPrice; // Already knocked in
-                        }
+                    if (H <= K) { price = isKnockOut ? 0 : vanillaPrice; }
+                    else {
+                        A = S * eqT * normalCDF(x1) - K * erT * normalCDF(x1 - sqrtT);
+                        C = S * eqT * HS * normalCDF(y) - K * erT * HS2 * normalCDF(y - sqrtT);
+                        if (isKnockOut) { price = S >= H ? 0 : A - C; }
+                        else { price = S >= H ? vanillaPrice : vanillaPrice - (A - C); }
                     }
                 } else {
-                    // Down barrier for call
-                    if (H >= K) {
-                        if (isKnockOut) {
-                            barrierPrice = vanillaPrice;
-                        } else {
-                            barrierPrice = 0;
-                        }
-                    } else {
-                        // Down-and-out/in call (H < K)
-                        const A = S * Math.exp(-q * T) * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
-                        const B = S * Math.exp(-q * T) * normalCDF(x1) - K * Math.exp(-r * T) * normalCDF(x1 - sigma * Math.sqrt(T));
-                        const C = S * Math.exp(-q * T) * Math.pow(H / S, 2 * lambda) * (normalCDF(-y) - normalCDF(-y1));
-                        const D = K * Math.exp(-r * T) * Math.pow(H / S, 2 * lambda - 2) * (normalCDF(-y + sigma * Math.sqrt(T)) - normalCDF(-y1 + sigma * Math.sqrt(T)));
-
-                        if (isKnockOut) {
-                            // Down-and-out call
-                            barrierPrice = A - B + C + D;
-                            if (S <= H) barrierPrice = 0;
-                        } else {
-                            // Down-and-in call
-                            barrierPrice = B - C - D;
-                            if (S <= H) barrierPrice = vanillaPrice;
-                        }
+                    if (H >= K) { price = isKnockOut ? vanillaPrice : 0; }
+                    else {
+                        A = S * eqT * normalCDF(d1) - K * erT * normalCDF(d2);
+                        B = S * eqT * normalCDF(x1) - K * erT * normalCDF(x1 - sqrtT);
+                        C = S * eqT * HS * (normalCDF(-y) - normalCDF(-y1));
+                        D = K * erT * HS2 * (normalCDF(-y + sqrtT) - normalCDF(-y1 + sqrtT));
+                        if (isKnockOut) { price = S <= H ? 0 : A - B + C + D; }
+                        else { price = S <= H ? vanillaPrice : B - C - D; }
                     }
                 }
             } else {
-                // Put options
                 if (isUp) {
-                    // Up barrier for put
                     if (H <= K) {
-                        const A = -S * Math.exp(-q * T) * normalCDF(-x1) + K * Math.exp(-r * T) * normalCDF(-x1 + sigma * Math.sqrt(T));
-                        const C = -S * Math.exp(-q * T) * Math.pow(H / S, 2 * lambda) * normalCDF(-y) 
-                                + K * Math.exp(-r * T) * Math.pow(H / S, 2 * lambda - 2) * normalCDF(-y + sigma * Math.sqrt(T));
-
-                        if (isKnockOut) {
-                            barrierPrice = A - C;
-                            if (S >= H) barrierPrice = 0;
-                        } else {
-                            barrierPrice = vanillaPrice - (A - C);
-                            if (S >= H) barrierPrice = vanillaPrice;
-                        }
-                    } else {
-                        if (isKnockOut) {
-                            barrierPrice = vanillaPrice;
-                        } else {
-                            barrierPrice = 0;
-                        }
-                    }
+                        A = -S * eqT * normalCDF(-x1) + K * erT * normalCDF(-x1 + sqrtT);
+                        C = -S * eqT * HS * normalCDF(-y) + K * erT * HS2 * normalCDF(-y + sqrtT);
+                        if (isKnockOut) { price = S >= H ? 0 : A - C; }
+                        else { price = S >= H ? vanillaPrice : vanillaPrice - (A - C); }
+                    } else { price = isKnockOut ? vanillaPrice : 0; }
                 } else {
-                    // Down barrier for put
-                    if (H >= K) {
-                        if (isKnockOut) {
-                            barrierPrice = 0;
-                        } else {
-                            barrierPrice = vanillaPrice;
-                        }
-                    } else {
-                        const A = -S * Math.exp(-q * T) * normalCDF(-d1) + K * Math.exp(-r * T) * normalCDF(-d2);
-                        const B = -S * Math.exp(-q * T) * normalCDF(-x1) + K * Math.exp(-r * T) * normalCDF(-x1 + sigma * Math.sqrt(T));
-                        const C = S * Math.exp(-q * T) * Math.pow(H / S, 2 * lambda) * (normalCDF(y) - normalCDF(y1));
-                        const D = K * Math.exp(-r * T) * Math.pow(H / S, 2 * lambda - 2) * (normalCDF(y - sigma * Math.sqrt(T)) - normalCDF(y1 - sigma * Math.sqrt(T)));
-
-                        if (isKnockOut) {
-                            // Down-and-out put
-                            barrierPrice = A - B + C + D;
-                            if (S <= H) barrierPrice = 0;
-                        } else {
-                            // Down-and-in put
-                            barrierPrice = B - C - D;
-                            if (S <= H) barrierPrice = vanillaPrice;
-                        }
+                    if (H >= K) { price = isKnockOut ? 0 : vanillaPrice; }
+                    else {
+                        A = -S * eqT * normalCDF(-d1) + K * erT * normalCDF(-d2);
+                        B = -S * eqT * normalCDF(-x1) + K * erT * normalCDF(-x1 + sqrtT);
+                        C = S * eqT * HS * (normalCDF(y) - normalCDF(y1));
+                        D = K * erT * HS2 * (normalCDF(y - sqrtT) - normalCDF(y1 - sqrtT));
+                        if (isKnockOut) { price = S <= H ? 0 : A - B + C + D; }
+                        else { price = S <= H ? vanillaPrice : B - C - D; }
                     }
                 }
             }
-
-            return Math.max(0, barrierPrice);
+            return Math.max(0, price);
         }
 
-        // Calculate Greeks numerically
         function calculateGreeks(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut) {
-            const epsilon = 0.01;
-            const price = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-
-            // Delta: ∂V/∂S
-            const priceUp = barrierOptionPrice(S + epsilon, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-            const priceDown = barrierOptionPrice(S - epsilon, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-            const delta = (priceUp - priceDown) / (2 * epsilon);
-
-            // Gamma: ∂²V/∂S²
-            const gamma = (priceUp - 2 * price + priceDown) / (epsilon * epsilon);
-
-            // Theta: ∂V/∂T (per day)
-            const dt = 1 / 365;
-            const priceNextDay = T > dt ? barrierOptionPrice(S, K, H, T - dt, r, q, sigma, isCall, isUp, isKnockOut) : 0;
-            const theta = (priceNextDay - price);
-
-            // Vega: ∂V/∂σ (per 1% move)
-            const dSigma = 0.01;
-            const priceVolUp = barrierOptionPrice(S, K, H, T, r, q, sigma + dSigma, isCall, isUp, isKnockOut);
-            const vega = (priceVolUp - price);
-
-            // Rho: ∂V/∂r (per 1% move)
-            const dr = 0.01;
-            const priceRateUp = barrierOptionPrice(S, K, H, T, r + dr, q, sigma, isCall, isUp, isKnockOut);
-            const rho = (priceRateUp - price);
-
-            // Lambda (leverage): Delta * S / V
-            const lambda = price > 0 ? (delta * S) / price : 0;
-
-            return { delta, gamma, theta, vega, rho, lambda };
+            var eps = 0.01, price = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
+            var pUp = barrierOptionPrice(S + eps, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
+            var pDown = barrierOptionPrice(S - eps, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
+            var delta = (pUp - pDown) / (2 * eps);
+            var gamma = (pUp - 2 * price + pDown) / (eps * eps);
+            var dt = 1 / 365;
+            var theta = T > dt ? barrierOptionPrice(S, K, H, T - dt, r, q, sigma, isCall, isUp, isKnockOut) - price : -price;
+            var vega = barrierOptionPrice(S, K, H, T, r, q, sigma + 0.01, isCall, isUp, isKnockOut) - price;
+            var rho = barrierOptionPrice(S, K, H, T, r + 0.01, q, sigma, isCall, isUp, isKnockOut) - price;
+            var lambdaVal = price > 0 ? (delta * S) / price : 0;
+            return { delta: delta, gamma: gamma, theta: theta, vega: vega, rho: rho, lambda: lambdaVal };
         }
 
         function setOptionType(type) {
@@ -871,10 +345,10 @@
             updateLabels();
         }
 
-        function setBarrierDirection(direction) {
-            barrierDirection = direction;
-            document.getElementById('upBtn').classList.toggle('active', direction === 'up');
-            document.getElementById('downBtn').classList.toggle('active', direction === 'down');
+        function setBarrierDirection(dir) {
+            barrierDirection = dir;
+            document.getElementById('upBtn').classList.toggle('active', dir === 'up');
+            document.getElementById('downBtn').classList.toggle('active', dir === 'down');
             updateLabels();
         }
 
@@ -886,79 +360,59 @@
         }
 
         function updateLabels() {
-            const directionLabel = barrierDirection === 'up' ? 'Up' : 'Down';
-            const typeLabel = barrierType === 'in' ? 'In' : 'Out';
-            const optLabel = optionType === 'call' ? 'Call' : 'Put';
-            
-            document.getElementById('optionTypeLabel').textContent = `${directionLabel}-and-${typeLabel} ${optLabel}`;
-            
-            // Update description
-            const descriptions = {
-                'up-out-call': 'An <strong>Up-and-Out Call</strong> is a call option that ceases to exist if the underlying asset price rises above the barrier level. This makes it cheaper than a vanilla call since there\'s a risk the option gets knocked out before expiry.',
-                'up-in-call': 'An <strong>Up-and-In Call</strong> only comes into existence if the underlying asset price rises above the barrier level. It\'s useful for betting on a significant upward move.',
-                'down-out-call': 'A <strong>Down-and-Out Call</strong> is a call option that ceases to exist if the underlying asset price falls below the barrier level. Provides downside protection for the seller.',
-                'down-in-call': 'A <strong>Down-and-In Call</strong> only comes into existence if the underlying asset price falls below the barrier level. Useful for betting on a rebound from a dip.',
-                'up-out-put': 'An <strong>Up-and-Out Put</strong> is a put option that ceases to exist if the underlying asset price rises above the barrier level. Cheaper than a vanilla put.',
-                'up-in-put': 'An <strong>Up-and-In Put</strong> only comes into existence if the underlying asset price rises above the barrier level. Useful for hedging after a rally.',
-                'down-out-put': 'A <strong>Down-and-Out Put</strong> is a put option that ceases to exist if the underlying asset price falls below the barrier level. Popular for cheaper downside protection.',
-                'down-in-put': 'A <strong>Down-and-In Put</strong> only comes into existence if the underlying asset price falls below the barrier level. Becomes active only when you need it most.'
+            var dir = barrierDirection === 'up' ? 'Up' : 'Down';
+            var typ = barrierType === 'in' ? 'In' : 'Out';
+            var opt = optionType === 'call' ? 'Call' : 'Put';
+            document.getElementById('optionTypeLabel').textContent = dir + '-and-' + typ + ' ' + opt;
+            var descs = {
+                'up-out-call': 'An <strong>Up-and-Out Call</strong> ceases to exist if spot rises above the barrier.',
+                'up-in-call': 'An <strong>Up-and-In Call</strong> activates only if spot rises above the barrier.',
+                'down-out-call': 'A <strong>Down-and-Out Call</strong> ceases to exist if spot falls below the barrier.',
+                'down-in-call': 'A <strong>Down-and-In Call</strong> activates only if spot falls below the barrier.',
+                'up-out-put': 'An <strong>Up-and-Out Put</strong> ceases to exist if spot rises above the barrier.',
+                'up-in-put': 'An <strong>Up-and-In Put</strong> activates only if spot rises above the barrier.',
+                'down-out-put': 'A <strong>Down-and-Out Put</strong> ceases to exist if spot falls below the barrier.',
+                'down-in-put': 'A <strong>Down-and-In Put</strong> activates only if spot falls below the barrier.'
             };
-
-            const key = `${barrierDirection}-${barrierType}-${optionType}`;
-            document.getElementById('optionDescription').innerHTML = descriptions[key] || '';
+            document.getElementById('optionDescription').innerHTML = descs[barrierDirection + '-' + barrierType + '-' + optionType] || '';
         }
 
-        function loadPreset(preset) {
-            const presets = {
-                'btc3m': { spot: 97000, strike: 100000, barrier: 110000, vol: 65, time: '0.25', direction: 'up', type: 'out', option: 'call' },
-                'eth1m': { spot: 3400, strike: 3200, barrier: 3000, vol: 75, time: '0.0833', direction: 'down', type: 'out', option: 'put' },
-                'spx6m': { spot: 5800, strike: 6000, barrier: 6500, vol: 18, time: '0.5', direction: 'up', type: 'out', option: 'call' }
+        function loadPreset(p) {
+            var presets = {
+                'btc3m': { spot: 97000, strike: 100000, barrier: 110000, vol: 65, time: '0.25', dir: 'up', type: 'out', opt: 'call' },
+                'eth1m': { spot: 3400, strike: 3200, barrier: 3000, vol: 75, time: '0.0833', dir: 'down', type: 'out', opt: 'put' },
+                'spx6m': { spot: 5800, strike: 6000, barrier: 6500, vol: 18, time: '0.5', dir: 'up', type: 'out', opt: 'call' }
             };
-
-            const p = presets[preset];
-            if (p) {
-                document.getElementById('spotPrice').value = p.spot;
-                document.getElementById('strikePrice').value = p.strike;
-                document.getElementById('barrierLevel').value = p.barrier;
-                document.getElementById('volatility').value = p.vol;
-                document.getElementById('timeToExpiry').value = p.time;
-                setOptionType(p.option);
-                setBarrierDirection(p.direction);
-                setBarrierType(p.type);
-                calculateOption();
-            }
+            var d = presets[p]; if (!d) return;
+            document.getElementById('spotPrice').value = d.spot;
+            document.getElementById('strikePrice').value = d.strike;
+            document.getElementById('barrierLevel').value = d.barrier;
+            document.getElementById('volatility').value = d.vol;
+            document.getElementById('timeToExpiry').value = d.time;
+            setOptionType(d.opt); setBarrierDirection(d.dir); setBarrierType(d.type);
+            calculateOption();
         }
 
         function calculateOption() {
-            // Get inputs
-            const S = parseFloat(document.getElementById('spotPrice').value);
-            const K = parseFloat(document.getElementById('strikePrice').value);
-            const H = parseFloat(document.getElementById('barrierLevel').value);
-            const T = parseFloat(document.getElementById('timeToExpiry').value);
-            const r = parseFloat(document.getElementById('riskFreeRate').value) / 100;
-            const q = parseFloat(document.getElementById('dividendYield').value) / 100;
-            const sigma = parseFloat(document.getElementById('volatility').value) / 100;
+            var S = parseFloat(document.getElementById('spotPrice').value);
+            var K = parseFloat(document.getElementById('strikePrice').value);
+            var H = parseFloat(document.getElementById('barrierLevel').value);
+            var T = parseFloat(document.getElementById('timeToExpiry').value);
+            var r = parseFloat(document.getElementById('riskFreeRate').value) / 100;
+            var q = parseFloat(document.getElementById('dividendYield').value) / 100;
+            var sigma = parseFloat(document.getElementById('volatility').value) / 100;
+            var isCall = optionType === 'call', isUp = barrierDirection === 'up', isKnockOut = barrierType === 'out';
 
-            const isCall = optionType === 'call';
-            const isUp = barrierDirection === 'up';
-            const isKnockOut = barrierType === 'out';
+            var bp = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
+            var vp = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
+            var greeks = calculateGreeks(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
 
-            // Calculate prices
-            const barrierPrice = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-            const vanillaPrice = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
+            document.getElementById('premiumValue').textContent = bp.toFixed(2);
+            var disc = ((vp - bp) / vp * 100).toFixed(1);
+            var cmp = document.getElementById('vanillaComparison');
+            cmp.textContent = disc + '% discount vs. vanilla ($' + vp.toFixed(2) + ')';
+            cmp.className = 'result-change' + (bp < vp ? '' : ' negative');
 
-            // Calculate Greeks
-            const greeks = calculateGreeks(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-
-            // Update display
-            document.getElementById('premiumValue').textContent = barrierPrice.toFixed(2);
-
-            const discount = ((vanillaPrice - barrierPrice) / vanillaPrice * 100).toFixed(1);
-            const comparisonEl = document.getElementById('vanillaComparison');
-            comparisonEl.textContent = `${discount}% discount vs. vanilla ($${vanillaPrice.toFixed(2)})`;
-            comparisonEl.className = 'result-change' + (barrierPrice < vanillaPrice ? '' : ' negative');
-
-            // Update Greeks
             document.getElementById('deltaValue').textContent = greeks.delta.toFixed(4);
             document.getElementById('gammaValue').textContent = greeks.gamma.toFixed(6);
             document.getElementById('thetaValue').textContent = greeks.theta.toFixed(2);
@@ -966,43 +420,34 @@
             document.getElementById('rhoValue').textContent = greeks.rho.toFixed(2);
             document.getElementById('lambdaValue').textContent = greeks.lambda.toFixed(2);
 
-            // Update barrier status
-            const statusIndicator = document.getElementById('statusIndicator');
-            const statusTitle = document.getElementById('statusTitle');
-            const statusDescription = document.getElementById('statusDescription');
+            var si = document.getElementById('statusIndicator');
+            var st = document.getElementById('statusTitle');
+            var sd = document.getElementById('statusDescription');
+            var breached = (isUp && S >= H) || (!isUp && S <= H);
 
-            let isBreached = (isUp && S >= H) || (!isUp && S <= H);
-
-            if (isBreached) {
-                if (isKnockOut) {
-                    statusIndicator.className = 'status-indicator inactive';
-                    statusIndicator.textContent = '✗';
-                    statusTitle.textContent = 'Option Knocked Out';
-                    statusDescription.textContent = 'Barrier has been breached - option is worthless';
-                } else {
-                    statusIndicator.className = 'status-indicator active';
-                    statusIndicator.textContent = '✓';
-                    statusTitle.textContent = 'Option Knocked In';
-                    statusDescription.textContent = 'Barrier has been breached - option is now active';
-                }
+            if (breached) {
+                if (isKnockOut) { si.className = 'status-indicator inactive'; si.textContent = 'X'; st.textContent = 'Knocked Out'; sd.textContent = 'Option is worthless'; }
+                else { si.className = 'status-indicator active'; si.textContent = 'OK'; st.textContent = 'Knocked In'; sd.textContent = 'Option is now active'; }
             } else {
-                if (isKnockOut) {
-                    statusIndicator.className = 'status-indicator active';
-                    statusIndicator.textContent = '✓';
-                    statusTitle.textContent = 'Option Active';
-                    statusDescription.textContent = `Barrier at $${H.toLocaleString()} not breached`;
-                } else {
-                    statusIndicator.className = 'status-indicator inactive';
-                    statusIndicator.textContent = '○';
-                    statusTitle.textContent = 'Option Inactive';
-                    statusDescription.textContent = `Waiting for barrier at $${H.toLocaleString()} to be breached`;
-                }
+                if (isKnockOut) { si.className = 'status-indicator active'; si.textContent = 'OK'; st.textContent = 'Option Active'; sd.textContent = 'Barrier at $' + H.toLocaleString() + ' not breached'; }
+                else { si.className = 'status-indicator inactive'; si.textContent = '..'; st.textContent = 'Option Inactive'; sd.textContent = 'Waiting for barrier at $' + H.toLocaleString(); }
             }
         }
 
-        // Initialize
-        updateLabels();
-        calculateOption();
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('calculateBtn').addEventListener('click', calculateOption);
+            document.getElementById('callBtn').addEventListener('click', function() { setOptionType('call'); });
+            document.getElementById('putBtn').addEventListener('click', function() { setOptionType('put'); });
+            document.getElementById('upBtn').addEventListener('click', function() { setBarrierDirection('up'); });
+            document.getElementById('downBtn').addEventListener('click', function() { setBarrierDirection('down'); });
+            document.getElementById('inBtn').addEventListener('click', function() { setBarrierType('in'); });
+            document.getElementById('outBtn').addEventListener('click', function() { setBarrierType('out'); });
+            document.getElementById('presetBtc3m').addEventListener('click', function() { loadPreset('btc3m'); });
+            document.getElementById('presetEth1m').addEventListener('click', function() { loadPreset('eth1m'); });
+            document.getElementById('presetSpx6m').addEventListener('click', function() { loadPreset('spx6m'); });
+            updateLabels();
+            calculateOption();
+        });
     </script>
 </body>
 </html>
