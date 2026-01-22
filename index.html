@@ -1,502 +1,455 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barrier Options Pricer</title>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-primary: #0a0a0b;
-            --bg-secondary: #111113;
-            --bg-tertiary: #18181b;
-            --border-color: #27272a;
-            --border-highlight: #3f3f46;
-            --text-primary: #fafafa;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --accent-orange: #f97316;
-            --accent-orange-dim: #ea580c;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --accent-blue: #3b82f6;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'JetBrains Mono', monospace; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 24px; }
-        header { margin-bottom: 48px; padding-bottom: 32px; border-bottom: 1px solid var(--border-color); }
-        .header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-        h1 { font-family: 'Instrument Serif', serif; font-size: 3rem; font-weight: 400; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .live-indicator { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
-        .live-dot { width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .subtitle { font-size: 0.875rem; color: var(--text-muted); font-weight: 300; }
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
-        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } }
-        .panel { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
-        .panel-header { padding: 20px 24px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .panel-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-secondary); font-weight: 500; }
-        .panel-badge { font-size: 0.65rem; padding: 4px 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 100px; color: var(--text-muted); text-transform: uppercase; }
-        .panel-body { padding: 24px; }
-        .input-section { margin-bottom: 28px; }
-        .section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-orange); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .section-label::before { content: ''; width: 12px; height: 1px; background: var(--accent-orange); }
-        .input-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-        .input-grid.triple { grid-template-columns: repeat(3, 1fr); }
-        .input-group { position: relative; }
-        .input-group.full-width { grid-column: 1 / -1; }
-        label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; }
-        input[type="number"], select { width: 100%; padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; }
-        input[type="number"]:focus, select:focus { outline: none; border-color: var(--accent-orange); }
-        select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 44px; }
-        .toggle-group { display: flex; gap: 8px; }
-        .toggle-btn { flex: 1; padding: 14px 16px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; cursor: pointer; text-transform: uppercase; }
-        .toggle-btn:hover { border-color: var(--border-highlight); color: var(--text-secondary); }
-        .toggle-btn.active { background: var(--accent-orange); border-color: var(--accent-orange); color: var(--bg-primary); font-weight: 500; }
-        .toggle-btn.call.active { background: var(--accent-green); border-color: var(--accent-green); }
-        .toggle-btn.put.active { background: var(--accent-red); border-color: var(--accent-red); }
-        .calculate-btn { width: 100%; padding: 18px 24px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-orange-dim) 100%); border: none; border-radius: 8px; color: white; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; margin-top: 8px; }
-        .calculate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3); }
-        .results-panel { display: flex; flex-direction: column; }
-        .result-main { padding: 32px 24px; text-align: center; border-bottom: 1px solid var(--border-color); background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%); }
-        .result-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 8px; }
-        .result-value { font-family: 'Instrument Serif', serif; font-size: 4rem; font-weight: 400; color: var(--text-primary); line-height: 1; margin-bottom: 8px; }
-        .result-value .currency { font-size: 2rem; color: var(--text-secondary); vertical-align: super; }
-        .result-change { font-size: 0.85rem; color: var(--accent-green); }
-        .result-change.negative { color: var(--accent-red); }
-        .greeks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border-color); }
-        .greek-item { background: var(--bg-secondary); padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; }
-        .greek-name { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; }
-        .greek-symbol { color: var(--accent-blue); margin-right: 6px; }
-        .greek-value { font-size: 1.1rem; font-weight: 500; color: var(--text-primary); }
-        .barrier-status { padding: 24px; border-top: 1px solid var(--border-color); display: flex; align-items: center; gap: 16px; }
-        .status-indicator { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-        .status-indicator.active { background: rgba(34, 197, 94, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); }
-        .status-indicator.inactive { background: rgba(239, 68, 68, 0.15); border: 1px solid var(--accent-red); color: var(--accent-red); }
-        .status-text h4 { font-size: 0.9rem; font-weight: 500; color: var(--text-primary); margin-bottom: 4px; }
-        .status-text p { font-size: 0.8rem; color: var(--text-muted); }
-        .info-panel { margin-top: 24px; padding: 20px 24px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; }
-        .info-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-blue); margin-bottom: 12px; }
-        .info-text { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.7; }
-        .quick-presets { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
-        .preset-btn { padding: 8px 14px; background: transparent; border: 1px solid var(--border-color); border-radius: 6px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; cursor: pointer; }
-        .preset-btn:hover { border-color: var(--accent-orange); color: var(--accent-orange); }
-    </style>
+<meta charset="UTF-8">
+<title>Monte Carlo Barrier Options Pricer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Courier New', monospace; background: #0d1117; color: #c9d1d9; padding: 20px; line-height: 1.5; }
+.container { max-width: 1200px; margin: 0 auto; }
+h1 { color: #58a6ff; margin-bottom: 20px; font-size: 24px; }
+.grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; }
+@media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+.panel { background: #161b22; border: 1px solid #30363d; border-radius: 6px; padding: 20px; margin-bottom: 20px; }
+.panel-title { color: #58a6ff; font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+label { display: block; color: #8b949e; font-size: 12px; margin: 12px 0 4px; }
+input, select { width: 100%; padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; border-radius: 4px; font-family: inherit; font-size: 14px; }
+input:focus, select:focus { outline: none; border-color: #58a6ff; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn-calc { width: 100%; padding: 14px; background: #238636; border: none; color: #fff; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 6px; margin-top: 20px; font-family: inherit; }
+.btn-calc:hover { background: #2ea043; }
+.btn-calc:disabled { background: #21262d; color: #484f58; cursor: not-allowed; }
+.results-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.results-table th, .results-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #30363d; }
+.results-table th { color: #8b949e; font-weight: normal; font-size: 11px; text-transform: uppercase; }
+.results-table tr:hover { background: #1f2428; }
+.highlight { color: #3fb950; }
+.param-display { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; font-size: 12px; }
+.param-item { background: #0d1117; padding: 8px 12px; border-radius: 4px; }
+.param-label { color: #8b949e; }
+.param-value { color: #c9d1d9; font-weight: bold; }
+.progress-bar { height: 4px; background: #21262d; border-radius: 2px; margin: 10px 0; overflow: hidden; }
+.progress-fill { height: 100%; background: #58a6ff; width: 0%; transition: width 0.3s; }
+.status { color: #8b949e; font-size: 12px; margin-top: 10px; }
+.greeks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
+.greek-item { background: #0d1117; padding: 12px; border-radius: 4px; text-align: center; }
+.greek-label { color: #8b949e; font-size: 11px; text-transform: uppercase; }
+.greek-value { color: #c9d1d9; font-size: 16px; margin-top: 4px; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-top">
-                <h1>Barrier Options Pricer</h1>
-                <div class="live-indicator"><div class="live-dot"></div><span>Model Ready</span></div>
+<div class="container">
+<h1>Monte Carlo Barrier Options Pricer</h1>
+<div class="grid">
+<div>
+    <div class="panel">
+        <div class="panel-title">Market Parameters</div>
+        <label>Spot Price (S₀)</label>
+        <input type="number" id="spot" value="3000">
+        <label>Strike Price (K)</label>
+        <input type="number" id="strike" value="3750">
+        <label>Barrier Level</label>
+        <input type="number" id="barrier" value="2500">
+        <div class="row">
+            <div>
+                <label>Volatility (%)</label>
+                <input type="number" id="vol" value="58" step="1">
             </div>
-            <p class="subtitle">Black-Scholes pricing engine for European barrier options with knock-in/knock-out features</p>
-        </header>
-        <div class="main-grid">
-            <div class="panel">
-                <div class="panel-header">
-                    <span class="panel-title">Parameters</span>
-                    <span class="panel-badge">Black-Scholes</span>
-                </div>
-                <div class="panel-body">
-                    <div class="quick-presets">
-                        <button class="preset-btn" id="presetBtc3m">BTC 3M Call</button>
-                        <button class="preset-btn" id="presetEth1m">ETH 1M Put</button>
-                        <button class="preset-btn" id="presetSpx6m">SPX 6M Call</button>
-                    </div>
-                    <div class="input-section">
-                        <div class="section-label">Underlying Asset</div>
-                        <div class="input-grid">
-                            <div class="input-group"><label>Spot Price ($)</label><input type="number" id="spotPrice" value="97000" step="100"></div>
-                            <div class="input-group"><label>Strike Price ($)</label><input type="number" id="strikePrice" value="100000" step="100"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <div class="section-label">Option Type</div>
-                        <div class="input-grid">
-                            <div class="input-group">
-                                <label>Call / Put</label>
-                                <div class="toggle-group">
-                                    <button class="toggle-btn call active" id="callBtn">Call</button>
-                                    <button class="toggle-btn put" id="putBtn">Put</button>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label>Time to Expiry</label>
-                                <select id="timeToExpiry">
-                                    <option value="0.0833">1 Month</option>
-                                    <option value="0.1667">2 Months</option>
-                                    <option value="0.25" selected>3 Months</option>
-                                    <option value="0.5">6 Months</option>
-                                    <option value="1">1 Year</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <div class="section-label">Barrier Configuration</div>
-                        <div class="input-grid">
-                            <div class="input-group">
-                                <label>Barrier Direction</label>
-                                <div class="toggle-group">
-                                    <button class="toggle-btn active" id="upBtn">Up</button>
-                                    <button class="toggle-btn" id="downBtn">Down</button>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label>Barrier Type</label>
-                                <div class="toggle-group">
-                                    <button class="toggle-btn" id="inBtn">Knock-In</button>
-                                    <button class="toggle-btn active" id="outBtn">Knock-Out</button>
-                                </div>
-                            </div>
-                            <div class="input-group full-width"><label>Barrier Level ($)</label><input type="number" id="barrierLevel" value="110000" step="100"></div>
-                        </div>
-                    </div>
-                    <div class="input-section">
-                        <div class="section-label">Market Parameters</div>
-                        <div class="input-grid triple">
-                            <div class="input-group"><label>Volatility (%)</label><input type="number" id="volatility" value="65" step="1"></div>
-                            <div class="input-group"><label>Risk-Free Rate (%)</label><input type="number" id="riskFreeRate" value="5" step="0.1"></div>
-                            <div class="input-group"><label>Dividend Yield (%)</label><input type="number" id="dividendYield" value="0" step="0.1"></div>
-                        </div>
-                    </div>
-                    <button class="calculate-btn" id="calculateBtn">Calculate Price</button>
-                </div>
+            <div>
+                <label>Risk-Free Rate (%)</label>
+                <input type="number" id="rate" value="3" step="0.1">
             </div>
-            <div class="panel results-panel">
-                <div class="panel-header">
-                    <span class="panel-title">Valuation</span>
-                    <span class="panel-badge" id="optionTypeLabel">Up-and-Out Call</span>
-                </div>
-                <div class="result-main">
-                    <div class="result-label">Option Premium</div>
-                    <div class="result-value"><span class="currency">$</span><span id="premiumValue">-</span></div>
-                    <div class="result-change" id="vanillaComparison">vs. vanilla: -</div>
-                </div>
-                <div class="greeks-grid">
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">D</span> Delta</span><span class="greek-value" id="deltaValue">-</span></div>
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">G</span> Gamma</span><span class="greek-value" id="gammaValue">-</span></div>
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">T</span> Theta</span><span class="greek-value" id="thetaValue">-</span></div>
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">V</span> Vega</span><span class="greek-value" id="vegaValue">-</span></div>
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">R</span> Rho</span><span class="greek-value" id="rhoValue">-</span></div>
-                    <div class="greek-item"><span class="greek-name"><span class="greek-symbol">L</span> Lambda</span><span class="greek-value" id="lambdaValue">-</span></div>
-                </div>
-                <div class="barrier-status">
-                    <div class="status-indicator active" id="statusIndicator">OK</div>
-                    <div class="status-text">
-                        <h4 id="statusTitle">Option Active</h4>
-                        <p id="statusDescription">Barrier has not been breached</p>
-                    </div>
-                </div>
-                <div class="info-panel">
-                    <div class="info-title">Barrier Option Details</div>
-                    <p class="info-text" id="optionDescription">An <strong>Up-and-Out Call</strong> is a call option that ceases to exist if the underlying asset price rises above the barrier level.</p>
-                </div>
+        </div>
+        <label>Days to Maturity</label>
+        <input type="number" id="days" value="90">
+        <label>Face (Coin Amount)</label>
+        <input type="number" id="face" value="1000">
+    </div>
+    <div class="panel">
+        <div class="panel-title">Option Settings</div>
+        <div class="row">
+            <div>
+                <label>Option Type</label>
+                <select id="optionType">
+                    <option value="put">Put</option>
+                    <option value="call">Call</option>
+                </select>
+            </div>
+            <div>
+                <label>Barrier Type</label>
+                <select id="barrierType">
+                    <option value="DO">Down-and-Out (DO)</option>
+                    <option value="DI">Down-and-In (DI)</option>
+                    <option value="UO">Up-and-Out (UO)</option>
+                    <option value="UI">Up-and-In (UI)</option>
+                </select>
             </div>
         </div>
     </div>
+    <div class="panel">
+        <div class="panel-title">Simulation Settings</div>
+        <div class="row">
+            <div>
+                <label>Paths per Epoch</label>
+                <input type="number" id="nPaths" value="10000">
+            </div>
+            <div>
+                <label>Epochs</label>
+                <input type="number" id="nEpoch" value="50">
+            </div>
+        </div>
+        <label>Timesteps per Day</label>
+        <input type="number" id="nTimesteps" value="3">
+    </div>
+    <button class="btn-calc" id="calcBtn">Run Monte Carlo Simulation</button>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <div class="status" id="status">Ready</div>
+</div>
+<div>
+    <div class="panel">
+        <div class="panel-title">Input Summary</div>
+        <div class="param-display" id="paramDisplay">
+            <div class="param-item"><span class="param-label">Spot:</span> <span class="param-value" id="dispSpot">-</span></div>
+            <div class="param-item"><span class="param-label">Strike:</span> <span class="param-value" id="dispStrike">-</span></div>
+            <div class="param-item"><span class="param-label">Barrier:</span> <span class="param-value" id="dispBarrier">-</span></div>
+            <div class="param-item"><span class="param-label">Type:</span> <span class="param-value" id="dispType">-</span></div>
+            <div class="param-item"><span class="param-label">Notional:</span> <span class="param-value" id="dispNotional">-</span></div>
+            <div class="param-item"><span class="param-label">Simulations:</span> <span class="param-value" id="dispSims">-</span></div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-title">Pricing Results</div>
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>USD/Coin</th>
+                    <th>Px %</th>
+                    <th>Total USD</th>
+                    <th>Disc to Van</th>
+                    <th>APR</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <tr><td colspan="6" style="color:#8b949e;text-align:center;padding:30px;">Run simulation to see results</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="panel">
+        <div class="panel-title">Greeks (American Barrier)</div>
+        <div class="greeks-grid">
+            <div class="greek-item"><div class="greek-label">Delta</div><div class="greek-value" id="gDelta">-</div></div>
+            <div class="greek-item"><div class="greek-label">Gamma</div><div class="greek-value" id="gGamma">-</div></div>
+            <div class="greek-item"><div class="greek-label">Vega</div><div class="greek-value" id="gVega">-</div></div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
 <script>
-(function() {
-    "use strict";
-    
-    var state = {
-        optionType: 'call',
-        barrierDirection: 'up',
-        barrierType: 'out'
-    };
+// Normal CDF approximation
+function normCdf(x) {
+    var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+    var sign = x < 0 ? -1 : 1;
+    x = Math.abs(x) / Math.sqrt(2);
+    var t = 1 / (1 + p * x);
+    var y = 1 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t * Math.exp(-x*x);
+    return 0.5 * (1 + sign * y);
+}
 
-    function normalCDF(x) {
-        var a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
-        var sign = x < 0 ? -1 : 1;
-        x = Math.abs(x) / Math.sqrt(2);
-        var t = 1.0 / (1.0 + p * x);
-        var y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
-        return 0.5 * (1.0 + sign * y);
-    }
-
-    function blackScholesVanilla(S, K, T, r, q, sigma, isCall) {
-        var d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / (sigma * Math.sqrt(T));
-        var d2 = d1 - sigma * Math.sqrt(T);
-        if (isCall) {
-            return S * Math.exp(-q * T) * normalCDF(d1) - K * Math.exp(-r * T) * normalCDF(d2);
-        }
-        return K * Math.exp(-r * T) * normalCDF(-d2) - S * Math.exp(-q * T) * normalCDF(-d1);
-    }
-
-    function barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut) {
-        var lambda = (r - q + sigma * sigma / 2) / (sigma * sigma);
-        var sqrtT = sigma * Math.sqrt(T);
-        var y = Math.log(H * H / (S * K)) / sqrtT + lambda * sqrtT;
-        var x1 = Math.log(S / H) / sqrtT + lambda * sqrtT;
-        var y1 = Math.log(H / S) / sqrtT + lambda * sqrtT;
-        var d1 = (Math.log(S / K) + (r - q + 0.5 * sigma * sigma) * T) / sqrtT;
-        var d2 = d1 - sqrtT;
-        var vanillaPrice = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
-        var price = 0;
-        var HS = Math.pow(H / S, 2 * lambda);
-        var HS2 = Math.pow(H / S, 2 * lambda - 2);
-        var eqT = Math.exp(-q * T);
-        var erT = Math.exp(-r * T);
-        var A, B, C, D;
-
-        if (isCall) {
-            if (isUp) {
-                if (H <= K) {
-                    price = isKnockOut ? 0 : vanillaPrice;
-                } else {
-                    A = S * eqT * normalCDF(x1) - K * erT * normalCDF(x1 - sqrtT);
-                    C = S * eqT * HS * normalCDF(y) - K * erT * HS2 * normalCDF(y - sqrtT);
-                    if (isKnockOut) {
-                        price = S >= H ? 0 : A - C;
-                    } else {
-                        price = S >= H ? vanillaPrice : vanillaPrice - (A - C);
-                    }
-                }
-            } else {
-                if (H >= K) {
-                    price = isKnockOut ? vanillaPrice : 0;
-                } else {
-                    A = S * eqT * normalCDF(d1) - K * erT * normalCDF(d2);
-                    B = S * eqT * normalCDF(x1) - K * erT * normalCDF(x1 - sqrtT);
-                    C = S * eqT * HS * (normalCDF(-y) - normalCDF(-y1));
-                    D = K * erT * HS2 * (normalCDF(-y + sqrtT) - normalCDF(-y1 + sqrtT));
-                    if (isKnockOut) {
-                        price = S <= H ? 0 : A - B + C + D;
-                    } else {
-                        price = S <= H ? vanillaPrice : B - C - D;
-                    }
-                }
-            }
-        } else {
-            if (isUp) {
-                if (H <= K) {
-                    A = -S * eqT * normalCDF(-x1) + K * erT * normalCDF(-x1 + sqrtT);
-                    C = -S * eqT * HS * normalCDF(-y) + K * erT * HS2 * normalCDF(-y + sqrtT);
-                    if (isKnockOut) {
-                        price = S >= H ? 0 : A - C;
-                    } else {
-                        price = S >= H ? vanillaPrice : vanillaPrice - (A - C);
-                    }
-                } else {
-                    price = isKnockOut ? vanillaPrice : 0;
-                }
-            } else {
-                if (H >= K) {
-                    price = isKnockOut ? 0 : vanillaPrice;
-                } else {
-                    A = -S * eqT * normalCDF(-d1) + K * erT * normalCDF(-d2);
-                    B = -S * eqT * normalCDF(-x1) + K * erT * normalCDF(-x1 + sqrtT);
-                    C = S * eqT * HS * (normalCDF(y) - normalCDF(y1));
-                    D = K * erT * HS2 * (normalCDF(y - sqrtT) - normalCDF(y1 - sqrtT));
-                    if (isKnockOut) {
-                        price = S <= H ? 0 : A - B + C + D;
-                    } else {
-                        price = S <= H ? vanillaPrice : B - C - D;
-                    }
-                }
-            }
-        }
-        return Math.max(0, price);
-    }
-
-    function calculateGreeks(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut) {
-        var eps = 0.01;
-        var price = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-        var pUp = barrierOptionPrice(S + eps, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-        var pDown = barrierOptionPrice(S - eps, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-        var delta = (pUp - pDown) / (2 * eps);
-        var gamma = (pUp - 2 * price + pDown) / (eps * eps);
-        var dt = 1 / 365;
-        var theta = T > dt ? barrierOptionPrice(S, K, H, T - dt, r, q, sigma, isCall, isUp, isKnockOut) - price : -price;
-        var vega = barrierOptionPrice(S, K, H, T, r, q, sigma + 0.01, isCall, isUp, isKnockOut) - price;
-        var rho = barrierOptionPrice(S, K, H, T, r + 0.01, q, sigma, isCall, isUp, isKnockOut) - price;
-        var lambdaVal = price > 0 ? (delta * S) / price : 0;
-        return { delta: delta, gamma: gamma, theta: theta, vega: vega, rho: rho, lambda: lambdaVal };
-    }
-
-    function updateLabels() {
-        var dir = state.barrierDirection === 'up' ? 'Up' : 'Down';
-        var typ = state.barrierType === 'in' ? 'In' : 'Out';
-        var opt = state.optionType === 'call' ? 'Call' : 'Put';
-        document.getElementById('optionTypeLabel').textContent = dir + '-and-' + typ + ' ' + opt;
-        
-        var descs = {
-            'up-out-call': 'An <strong>Up-and-Out Call</strong> ceases to exist if spot rises above the barrier.',
-            'up-in-call': 'An <strong>Up-and-In Call</strong> activates only if spot rises above the barrier.',
-            'down-out-call': 'A <strong>Down-and-Out Call</strong> ceases to exist if spot falls below the barrier.',
-            'down-in-call': 'A <strong>Down-and-In Call</strong> activates only if spot falls below the barrier.',
-            'up-out-put': 'An <strong>Up-and-Out Put</strong> ceases to exist if spot rises above the barrier.',
-            'up-in-put': 'An <strong>Up-and-In Put</strong> activates only if spot rises above the barrier.',
-            'down-out-put': 'A <strong>Down-and-Out Put</strong> ceases to exist if spot falls below the barrier.',
-            'down-in-put': 'A <strong>Down-and-In Put</strong> activates only if spot falls below the barrier.'
-        };
-        var key = state.barrierDirection + '-' + state.barrierType + '-' + state.optionType;
-        document.getElementById('optionDescription').innerHTML = descs[key] || '';
-    }
-
-    function calculateOption() {
-        var S = parseFloat(document.getElementById('spotPrice').value);
-        var K = parseFloat(document.getElementById('strikePrice').value);
-        var H = parseFloat(document.getElementById('barrierLevel').value);
-        var T = parseFloat(document.getElementById('timeToExpiry').value);
-        var r = parseFloat(document.getElementById('riskFreeRate').value) / 100;
-        var q = parseFloat(document.getElementById('dividendYield').value) / 100;
-        var sigma = parseFloat(document.getElementById('volatility').value) / 100;
-        var isCall = state.optionType === 'call';
-        var isUp = state.barrierDirection === 'up';
-        var isKnockOut = state.barrierType === 'out';
-
-        var bp = barrierOptionPrice(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-        var vp = blackScholesVanilla(S, K, T, r, q, sigma, isCall);
-        var greeks = calculateGreeks(S, K, H, T, r, q, sigma, isCall, isUp, isKnockOut);
-
-        document.getElementById('premiumValue').textContent = bp.toFixed(2);
-        var disc = ((vp - bp) / vp * 100).toFixed(1);
-        var cmp = document.getElementById('vanillaComparison');
-        cmp.textContent = disc + '% discount vs. vanilla ($' + vp.toFixed(2) + ')';
-        cmp.className = 'result-change' + (bp < vp ? '' : ' negative');
-
-        document.getElementById('deltaValue').textContent = greeks.delta.toFixed(4);
-        document.getElementById('gammaValue').textContent = greeks.gamma.toFixed(6);
-        document.getElementById('thetaValue').textContent = greeks.theta.toFixed(2);
-        document.getElementById('vegaValue').textContent = greeks.vega.toFixed(2);
-        document.getElementById('rhoValue').textContent = greeks.rho.toFixed(2);
-        document.getElementById('lambdaValue').textContent = greeks.lambda.toFixed(2);
-
-        var si = document.getElementById('statusIndicator');
-        var st = document.getElementById('statusTitle');
-        var sd = document.getElementById('statusDescription');
-        var breached = (isUp && S >= H) || (!isUp && S <= H);
-
-        if (breached) {
-            if (isKnockOut) {
-                si.className = 'status-indicator inactive';
-                si.textContent = 'X';
-                st.textContent = 'Knocked Out';
-                sd.textContent = 'Option is worthless';
-            } else {
-                si.className = 'status-indicator active';
-                si.textContent = 'OK';
-                st.textContent = 'Knocked In';
-                sd.textContent = 'Option is now active';
-            }
-        } else {
-            if (isKnockOut) {
-                si.className = 'status-indicator active';
-                si.textContent = 'OK';
-                st.textContent = 'Option Active';
-                sd.textContent = 'Barrier at $' + H.toLocaleString() + ' not breached';
-            } else {
-                si.className = 'status-indicator inactive';
-                si.textContent = '..';
-                st.textContent = 'Option Inactive';
-                sd.textContent = 'Waiting for barrier at $' + H.toLocaleString();
-            }
-        }
-    }
-
-    function setOptionType(type) {
-        state.optionType = type;
-        document.getElementById('callBtn').className = 'toggle-btn call' + (type === 'call' ? ' active' : '');
-        document.getElementById('putBtn').className = 'toggle-btn put' + (type === 'put' ? ' active' : '');
-        updateLabels();
-    }
-
-    function setBarrierDirection(dir) {
-        state.barrierDirection = dir;
-        document.getElementById('upBtn').className = 'toggle-btn' + (dir === 'up' ? ' active' : '');
-        document.getElementById('downBtn').className = 'toggle-btn' + (dir === 'down' ? ' active' : '');
-        updateLabels();
-    }
-
-    function setBarrierType(type) {
-        state.barrierType = type;
-        document.getElementById('inBtn').className = 'toggle-btn' + (type === 'in' ? ' active' : '');
-        document.getElementById('outBtn').className = 'toggle-btn' + (type === 'out' ? ' active' : '');
-        updateLabels();
-    }
-
-    function loadPreset(name) {
-        var presets = {
-            'btc3m': { spot: 97000, strike: 100000, barrier: 110000, vol: 65, time: '0.25', dir: 'up', type: 'out', opt: 'call' },
-            'eth1m': { spot: 3400, strike: 3200, barrier: 3000, vol: 75, time: '0.0833', dir: 'down', type: 'out', opt: 'put' },
-            'spx6m': { spot: 5800, strike: 6000, barrier: 6500, vol: 18, time: '0.5', dir: 'up', type: 'out', opt: 'call' }
-        };
-        var p = presets[name];
-        if (!p) return;
-        document.getElementById('spotPrice').value = p.spot;
-        document.getElementById('strikePrice').value = p.strike;
-        document.getElementById('barrierLevel').value = p.barrier;
-        document.getElementById('volatility').value = p.vol;
-        document.getElementById('timeToExpiry').value = p.time;
-        setOptionType(p.opt);
-        setBarrierDirection(p.dir);
-        setBarrierType(p.type);
-        calculateOption();
-    }
-
-    function init() {
-        document.getElementById('calculateBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            calculateOption();
-        });
-        
-        document.getElementById('callBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setOptionType('call');
-        });
-        
-        document.getElementById('putBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setOptionType('put');
-        });
-        
-        document.getElementById('upBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setBarrierDirection('up');
-        });
-        
-        document.getElementById('downBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setBarrierDirection('down');
-        });
-        
-        document.getElementById('inBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setBarrierType('in');
-        });
-        
-        document.getElementById('outBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            setBarrierType('out');
-        });
-        
-        document.getElementById('presetBtc3m').addEventListener('click', function(e) {
-            e.preventDefault();
-            loadPreset('btc3m');
-        });
-        
-        document.getElementById('presetEth1m').addEventListener('click', function(e) {
-            e.preventDefault();
-            loadPreset('eth1m');
-        });
-        
-        document.getElementById('presetSpx6m').addEventListener('click', function(e) {
-            e.preventDefault();
-            loadPreset('spx6m');
-        });
-
-        updateLabels();
-        calculateOption();
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
+// Black-Scholes analytical price
+function bsPrice(S, K, T, r, sigma, isCall) {
+    var d1 = (Math.log(S/K) + (r + 0.5*sigma*sigma)*T) / (sigma*Math.sqrt(T));
+    var d2 = d1 - sigma*Math.sqrt(T);
+    if (isCall) {
+        return S * normCdf(d1) - K * Math.exp(-r*T) * normCdf(d2);
     } else {
-        init();
+        return K * Math.exp(-r*T) * normCdf(-d2) - S * normCdf(-d1);
     }
-})();
+}
+
+// Box-Muller transform for normal random numbers
+function randn() {
+    var u1 = Math.random(), u2 = Math.random();
+    return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+}
+
+// Generate GBM paths with antithetic variates
+function generatePaths(S0, r, sigma, T, N, nPaths) {
+    var dt = T / N;
+    var paths = [];
+    var halfPaths = nPaths / 2;
+    
+    for (var p = 0; p < halfPaths; p++) {
+        var path1 = [S0], path2 = [S0];
+        var s1 = S0, s2 = S0;
+        for (var t = 0; t < N; t++) {
+            var z = randn();
+            var drift = (r - 0.5*sigma*sigma) * dt;
+            var diffusion = sigma * Math.sqrt(dt);
+            s1 = s1 * Math.exp(drift + diffusion * z);
+            s2 = s2 * Math.exp(drift - diffusion * z);
+            path1.push(s1);
+            path2.push(s2);
+        }
+        paths.push(path1);
+        paths.push(path2);
+    }
+    return paths;
+}
+
+// European vanilla payoff
+function europeanVanilla(paths, K, r, T, isCall) {
+    var sum = 0;
+    for (var i = 0; i < paths.length; i++) {
+        var ST = paths[i][paths[i].length - 1];
+        var payoff = isCall ? Math.max(ST - K, 0) : Math.max(K - ST, 0);
+        sum += payoff;
+    }
+    return Math.exp(-r * T) * sum / paths.length;
+}
+
+// European barrier (only checks terminal price)
+function europeanBarrier(paths, K, barrier, barrierType, isCall, r, T) {
+    var sum = 0;
+    for (var i = 0; i < paths.length; i++) {
+        var ST = paths[i][paths[i].length - 1];
+        var payoff = isCall ? Math.max(ST - K, 0) : Math.max(K - ST, 0);
+        var alive = 1;
+        
+        if (barrierType === 'UO') alive = ST <= barrier ? 1 : 0;
+        else if (barrierType === 'DO') alive = ST >= barrier ? 1 : 0;
+        else if (barrierType === 'UI') alive = ST >= barrier ? 1 : 0;
+        else if (barrierType === 'DI') alive = ST <= barrier ? 1 : 0;
+        
+        sum += payoff * alive;
+    }
+    return Math.exp(-r * T) * sum / paths.length;
+}
+
+// American discrete barrier (checks at daily intervals)
+function americanDiscreteBarrier(paths, K, barrier, barrierType, isCall, r, T, stepsPerDay) {
+    var sum = 0;
+    var N = paths[0].length - 1;
+    
+    for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        var ST = path[N];
+        var payoff = isCall ? Math.max(ST - K, 0) : Math.max(K - ST, 0);
+        var alive = 1;
+        
+        // Check barrier at daily intervals
+        for (var t = 0; t <= N; t += stepsPerDay) {
+            var S = path[t];
+            if (barrierType === 'UO' && S > barrier) { alive = 0; break; }
+            if (barrierType === 'DO' && S < barrier) { alive = 0; break; }
+            if (barrierType === 'UI' && S > barrier) { alive = 1; break; }
+            if (barrierType === 'DI' && S < barrier) { alive = 1; break; }
+        }
+        
+        // For knock-in, need to invert logic
+        if (barrierType === 'UI' || barrierType === 'DI') {
+            var hit = 0;
+            for (var t = 0; t <= N; t += stepsPerDay) {
+                var S = path[t];
+                if (barrierType === 'UI' && S >= barrier) { hit = 1; break; }
+                if (barrierType === 'DI' && S <= barrier) { hit = 1; break; }
+            }
+            alive = hit;
+        }
+        
+        sum += payoff * alive;
+    }
+    return Math.exp(-r * T) * sum / paths.length;
+}
+
+// American continuous barrier (checks all timesteps)
+function americanBarrier(paths, K, barrier, barrierType, isCall, r, T) {
+    var sum = 0;
+    var N = paths[0].length - 1;
+    
+    for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        var ST = path[N];
+        var payoff = isCall ? Math.max(ST - K, 0) : Math.max(K - ST, 0);
+        var alive = 1;
+        
+        // Check all timesteps
+        if (barrierType === 'UO') {
+            for (var t = 0; t <= N; t++) {
+                if (path[t] > barrier) { alive = 0; break; }
+            }
+        } else if (barrierType === 'DO') {
+            for (var t = 0; t <= N; t++) {
+                if (path[t] < barrier) { alive = 0; break; }
+            }
+        } else if (barrierType === 'UI') {
+            alive = 0;
+            for (var t = 0; t <= N; t++) {
+                if (path[t] >= barrier) { alive = 1; break; }
+            }
+        } else if (barrierType === 'DI') {
+            alive = 0;
+            for (var t = 0; t <= N; t++) {
+                if (path[t] <= barrier) { alive = 1; break; }
+            }
+        }
+        
+        sum += payoff * alive;
+    }
+    return Math.exp(-r * T) * sum / paths.length;
+}
+
+// Main calculation
+function runSimulation() {
+    var S0 = parseFloat(document.getElementById('spot').value);
+    var K = parseFloat(document.getElementById('strike').value);
+    var barrier = parseFloat(document.getElementById('barrier').value);
+    var sigma = parseFloat(document.getElementById('vol').value) / 100;
+    var r = parseFloat(document.getElementById('rate').value) / 100;
+    var days = parseInt(document.getElementById('days').value);
+    var face = parseFloat(document.getElementById('face').value);
+    var nPaths = parseInt(document.getElementById('nPaths').value);
+    var nEpoch = parseInt(document.getElementById('nEpoch').value);
+    var stepsPerDay = parseInt(document.getElementById('nTimesteps').value);
+    var optionType = document.getElementById('optionType').value;
+    var barrierType = document.getElementById('barrierType').value;
+    
+    var isCall = optionType === 'call';
+    var T = days / 365;
+    var N = days * stepsPerDay;
+    var notional = S0 * face;
+    
+    // Update display
+    document.getElementById('dispSpot').textContent = S0.toLocaleString();
+    document.getElementById('dispStrike').textContent = K.toLocaleString();
+    document.getElementById('dispBarrier').textContent = barrier.toLocaleString();
+    document.getElementById('dispType').textContent = barrierType + ' ' + optionType.toUpperCase();
+    document.getElementById('dispNotional').textContent = '$' + notional.toLocaleString();
+    document.getElementById('dispSims').textContent = (nPaths * nEpoch).toLocaleString();
+    
+    // Disable button
+    var btn = document.getElementById('calcBtn');
+    btn.disabled = true;
+    btn.textContent = 'Running...';
+    
+    var sumVanilla = 0, sumEuroBarrier = 0, sumAmericanDiscrete = 0, sumAmericanBarrier = 0;
+    var epoch = 0;
+    
+    function runEpoch() {
+        if (epoch >= nEpoch) {
+            // Finished - calculate final prices
+            var totalPaths = nPaths * nEpoch;
+            var priceVanillaMC = sumVanilla / nEpoch;
+            var priceEuroBarrierMC = sumEuroBarrier / nEpoch;
+            var priceAmericanDiscreteMC = sumAmericanDiscrete / nEpoch;
+            var priceAmericanBarrierMC = sumAmericanBarrier / nEpoch;
+            var priceVanillaBS = bsPrice(S0, K, T, r, sigma, isCall);
+            
+            // Display results
+            displayResults(S0, priceVanillaMC, priceVanillaBS, priceEuroBarrierMC, priceAmericanDiscreteMC, priceAmericanBarrierMC, face, days);
+            
+            // Calculate Greeks
+            calculateGreeks(S0, K, barrier, T, r, sigma, isCall, barrierType, nPaths, Math.min(nEpoch, 20), N, stepsPerDay);
+            
+            btn.disabled = false;
+            btn.textContent = 'Run Monte Carlo Simulation';
+            document.getElementById('status').textContent = 'Completed: ' + totalPaths.toLocaleString() + ' paths simulated';
+            document.getElementById('progress').style.width = '100%';
+            return;
+        }
+        
+        // Generate paths and price
+        var paths = generatePaths(S0, r, sigma, T, N, nPaths);
+        
+        sumVanilla += europeanVanilla(paths, K, r, T, isCall);
+        sumEuroBarrier += europeanBarrier(paths, K, barrier, barrierType, isCall, r, T);
+        sumAmericanDiscrete += americanDiscreteBarrier(paths, K, barrier, barrierType, isCall, r, T, stepsPerDay);
+        sumAmericanBarrier += americanBarrier(paths, K, barrier, barrierType, isCall, r, T);
+        
+        epoch++;
+        var pct = (epoch / nEpoch * 100).toFixed(0);
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('status').textContent = 'Running epoch ' + epoch + ' of ' + nEpoch + '...';
+        
+        // Use setTimeout to allow UI updates
+        setTimeout(runEpoch, 0);
+    }
+    
+    runEpoch();
+}
+
+function displayResults(S0, vanillaMC, vanillaBS, euroBarrier, amDiscrete, amBarrier, face, days) {
+    var tbody = document.getElementById('resultsBody');
+    var rows = [
+        ['Vanilla MC', vanillaMC, '-', '-'],
+        ['Vanilla BS', vanillaBS, '-', '-'],
+        ['European Barrier MC', euroBarrier, vanillaBS, true],
+        ['American Discrete', amDiscrete, vanillaBS, true],
+        ['American Barrier', amBarrier, vanillaBS, true]
+    ];
+    
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var price = r[1];
+        var pxPct = (price / S0 * 100).toFixed(2) + '%';
+        var totalUsd = (price * face).toFixed(2);
+        var disc = r[2] !== '-' ? (((price / r[2]) - 1) * 100).toFixed(2) + '%' : '-';
+        var apr = r[3] ? ((price / S0) * 100 * (365 / days)).toFixed(2) + '%' : '-';
+        
+        html += '<tr>';
+        html += '<td>' + r[0] + '</td>';
+        html += '<td>' + price.toFixed(4) + '</td>';
+        html += '<td>' + pxPct + '</td>';
+        html += '<td>$' + parseFloat(totalUsd).toLocaleString() + '</td>';
+        html += '<td>' + disc + '</td>';
+        html += '<td>' + apr + '</td>';
+        html += '</tr>';
+    }
+    tbody.innerHTML = html;
+}
+
+function calculateGreeks(S0, K, barrier, T, r, sigma, isCall, barrierType, nPaths, nEpoch, N, stepsPerDay) {
+    var eps = 0.005;
+    var S_up = S0 * (1 + eps);
+    var S_down = S0 * (1 - eps);
+    var sigma_up = sigma + 0.01;
+    
+    // Price at different spots
+    var price_base = 0, price_up = 0, price_down = 0, price_vega = 0;
+    
+    for (var e = 0; e < nEpoch; e++) {
+        var paths = generatePaths(S0, r, sigma, T, N, nPaths);
+        price_base += americanBarrier(paths, K, barrier, barrierType, isCall, r, T);
+        
+        var pathsUp = generatePaths(S_up, r, sigma, T, N, nPaths);
+        price_up += americanBarrier(pathsUp, K, barrier, barrierType, isCall, r, T);
+        
+        var pathsDown = generatePaths(S_down, r, sigma, T, N, nPaths);
+        price_down += americanBarrier(pathsDown, K, barrier, barrierType, isCall, r, T);
+        
+        var pathsVega = generatePaths(S0, r, sigma_up, T, N, nPaths);
+        price_vega += americanBarrier(pathsVega, K, barrier, barrierType, isCall, r, T);
+    }
+    
+    price_base /= nEpoch;
+    price_up /= nEpoch;
+    price_down /= nEpoch;
+    price_vega /= nEpoch;
+    
+    var delta = (price_up - price_down) / (2 * S0 * eps);
+    var gamma = (price_up - 2 * price_base + price_down) / Math.pow(S0 * eps, 2);
+    var vega = price_vega - price_base;
+    
+    document.getElementById('gDelta').textContent = delta.toFixed(4);
+    document.getElementById('gGamma').textContent = gamma.toFixed(6);
+    document.getElementById('gVega').textContent = vega.toFixed(4);
+}
+
+// Attach event listener
+document.getElementById('calcBtn').addEventListener('click', runSimulation);
 </script>
 </body>
 </html>
